@@ -7,10 +7,30 @@
     <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS file for styling -->
 </head>
 <body>
+{% with messages = get_flashed_messages(with_categories=true)%}
+{%if messages%}
+    {% for catergory, message in messages %}
+    {% if catergory == 'error' %}
+    <div class"alert danger" rple = "alert"> 
+        {{ message }}
+        <button type="button" class = "close" data-dismiss="alert">
 
+        </button>    
+    </div>
+    {% else %}
+    <div class"alert success" rple = "alert"> 
+        {{ message }}
+        <button type="button" class = "close" data-dismiss="alert">
+
+        </button>    
+    </div>
+    {% endif %}
+    {% endfor %}
+{% endif %}    
+{% endwith%}
     <div class="container">
         <h2>Register</h2>
-        <form action="register.php" method="post">
+        <form action="register" method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
