@@ -18,4 +18,57 @@
         <button type="submit" class="btn btn-primary">Add Note</button>
       </div>
     </form>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 20px;
+      }
+      table {
+          border-collapse: collapse;
+          margin: 10px 0;
+          width: 80%;
+      }
+      table, th, td {
+          border: 1px solid black;
+      }
+      th, td {
+          padding: 8px;
+          text-align: center;
+      }
+      button {
+          padding: 10px 20px;
+          font-size: 16px;
+          margin-bottom: 20px;
+      }
+  </style>
+</head>
+<body>
+  <button id="create-table">Create Table</button>
+  <div id="table-container"></div>
+
+  <script>
+      document.getElementById('create-table').addEventListener('click', () => {
+          const tableContainer = document.getElementById('table-container');
+          const newTable = document.createElement('table');
+          
+          const rows = 3;
+          const cols = 3;
+          
+          for (let i = 0; i < rows; i++) {
+              const tr = document.createElement('tr');
+              for (let j = 0; j < cols; j++) {
+                  const td = document.createElement('td');
+                  td.textContent = `Row ${i + 1}, Col ${j + 1}`;
+                  tr.appendChild(td);
+              }
+              newTable.appendChild(tr);
+          }
+
+          tableContainer.appendChild(newTable);
+      });
+  </script>
+</body>
     {% endblock %}
