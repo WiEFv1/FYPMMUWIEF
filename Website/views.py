@@ -34,7 +34,18 @@ def home():
             db.session.add(new_task)
             db.session.commit()
             flash('Task Added!', category='success')
-
+        
+        if 'edit_task' in request.form:
+            task_id = request.form.get('task_id')
+            task = Task.query.get(task_id)
+            if task:
+                task.task_name = request.form.get('task_name')
+                task.task_status = request.form.get('task_status')
+                task.deadline = request.form.get('deadline')
+                task.description = request.form.get('description')
+                db.session.commit()
+                flash('Task Updated!', category='success')
+        
     return render_template("home.html", user=current_user)
 
 @views.route('/delete-note', methods=['POST'])
