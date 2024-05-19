@@ -28,7 +28,7 @@ class Task(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     projecttable_id = db.Column(db.Integer, db.ForeignKey('projecttable.id'))
-    comments = db.relationship('Comment', backref='task', foreign_keys='Comment.task_id')
+    comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
 
 class Projecttable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
