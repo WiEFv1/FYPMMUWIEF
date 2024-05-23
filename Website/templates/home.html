@@ -18,39 +18,46 @@
 {% for projecttable in user.project_tables %}
 <form method="POST">
 <div class="project-table-container">
-  <h2>{{ projecttable.name }}</h2>
-  <p>{{ projecttable.description }}</p>
-  <table class="table table-striped table-bordered table-hover table-sm">
-    <thead class="thead-dark">
+<h2>{{ projecttable.name }}</h2>
+<p>{{ projecttable.description }}</p>
+<table class="table table-striped table-bordered table-hover table-sm">
+  <thead class="thead-dark">
+    <tr>
+      <th>Task</th>
+      <th>Status</th>
+      <th>Deadline</th>
+      <th>Description</th>
+      <th>Comments</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for task in projecttable.tasks %}
       <tr>
-        <th>Task</th>
-        <th>Status</th>
-        <th>Deadline</th>
-        <th>Description</th>
-        <th>Comments</th>
-        <th>Edit</th>
+        <td>{{ task.task_name }}</td>
+        <td>{{ task.task_status }}</td>
+        <td>{{ task.deadline }}</td>
+        <td>{{ task.description }}</td>
+        <td>
+          {% for comment in task.comments %}
+            <p>{{ comment.comment_detail }}</p>
+          {% endfor %}
+        </td>
+        <td>
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#editTaskModal" 
+                  data-task-id="{{ task.id }}" 
+                  data-task-name="{{ task.task_name }}"
+                  data-task-status="{{ task.task_status }}"
+                  data-task-deadline="{{ task.deadline }}"
+                  data-task-description="{{ task.description }}">
+            Edit Task
+          </button>
+        </td>
       </tr>
-    </thead>
-    <tbody>
-      {% for task in projecttable.tasks %}
-        <tr>
-          <td>{{ task.task_name }}</td>
-          <td>{{ task.task_status }}</td>
-          <td>{{ task.deadline }}</td>
-          <td>{{ task.description }}</td>
-          <td>
-            {% for comment in task.comments %}
-              <p>{{ comment.comment_detail }}</p>
-            {% endfor %}
-          </td>
-          <td>
-            <button type="button" class="btn btn-secondary" onclick="editTask({{ task.id }}, '{{ task.task_name }}', '{{ task.task_status }}', '{{ task.deadline }}', '{{ task.description }}')">Edit Task</button>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <button type="submit" class="btn btn-secondary add-task-button" name="add_task" value="{{ projecttable.id }}">Add Task</button>
+    {% endfor %}
+  </tbody>
+</table>
+<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addTaskModal" onclick="setProjectId({{ projecttable.id }})">Add Task</button>
 </div>
 </form>
 {% endfor %}
@@ -104,6 +111,47 @@
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" name="edit_task">Save changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <!--ISSUE: DELETE FUNCTION NOT WORKING AS INTENDED-->
+          <button type="submit" class="btn btn-danger" name="delete_task" value="editTaskId">Delete Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="addTaskModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Task</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" id="addTaskForm">
+        <div class="modal-body">
+          <input type="hidden" name="projecttable_id" id="projecttableId">
+          <div class="form-group">
+            <label for="addTaskName">Task Name</label>
+            <input type="text" class="form-control" name="task_name" id="addTaskName">
+          </div>
+          <div class="form-group">
+            <label for="addTaskStatus">Task Status</label>
+            <input type="text" class="form-control" name="task_status" id="addTaskStatus">
+          </div>
+          <div class="form-group">
+            <label for="addTaskDeadline">Deadline</label>
+            <input type="text" class="form-control" name="deadline" id="addTaskDeadline">
+          </div>
+          <div class="form-group">
+            <label for="addTaskDescription">Description</label>
+            <textarea class="form-control" name="description" id="addTaskDescription"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" name="add_task">Add Task</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </form>
     </div>
@@ -118,6 +166,9 @@
     document.getElementById('editTaskDeadline').value = deadline;
     document.getElementById('editTaskDescription').value = description;
     $('#editTaskModal').modal('show');
+  }
+  function setProjectId(projectId) {
+    document.getElementById('projecttableId').value = projectId;
   }
 </script>
 
