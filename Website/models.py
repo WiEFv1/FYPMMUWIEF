@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
     tasks = db.relationship('Task', foreign_keys='Task.user_id')
     comments = db.relationship('Comment', foreign_keys='Comment.user_id')
     project_tables = db.relationship('Projecttable', foreign_keys='Projecttable.user_id')
+    project = db.relationship('Project',foreign_keys='Project.user_id')
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,3 +43,9 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment_detail = db.Column(db.String(10000))
     task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+
+class Project(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10000))  
+    description = db.Column(db.String(10000))  
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

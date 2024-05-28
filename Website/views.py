@@ -8,7 +8,7 @@ import json
 
 views = Blueprint('views', __name__)
 
-@views.route('/', methods=['GET', 'POST'])
+@views.route('/taskmanagement', methods=['GET', 'POST'])
 @login_required
 def home():
     if request.method == 'POST':
@@ -76,6 +76,6 @@ def delete_note():
 
     return jsonify({})
 
-@views.route('/task-management')
+@views.route('/home')
 def mainpage():
     return render_template("taskmanagementweb.html", user=current_user)
