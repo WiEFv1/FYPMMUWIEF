@@ -36,6 +36,7 @@ class Projecttable(db.Model):
     name = db.Column(db.String(10000))  
     description = db.Column(db.String(10000))  
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
     tasks = db.relationship('Task', backref='projecttable', foreign_keys='Task.projecttable_id')
 
 class Comment(db.Model):
@@ -49,3 +50,4 @@ class Project(db.Model):
     name = db.Column(db.String(10000))  
     description = db.Column(db.String(10000))  
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    projecttable = db.relationship('Projecttable', backref='project', foreign_keys='Projecttable.project_id')

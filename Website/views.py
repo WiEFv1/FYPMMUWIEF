@@ -1,6 +1,4 @@
-# views.py
-
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
 from .models import *
 from . import db
@@ -11,6 +9,11 @@ views = Blueprint('views', __name__)
 @views.route('/taskmanagement', methods=['GET', 'POST'])
 @login_required
 def home():
+    project_id = request.args.get('project_id')
+
+    if project_id:
+        project_id = int(project_id)
+
     if request.method == 'POST':
         if 'add_note' in request.form:
             note = request.form.get('note')  # Gets the note from the HTML
@@ -23,7 +26,7 @@ def home():
                 flash('Note added!', category='success')
         
         if 'create_table' in request.form:  # Check if the create table form is submitted
-            new_projecttable = Projecttable(user_id=current_user.id, name="Untitled Table", description="Insert Description Here")
+            new_projecttable = Projecttable(user_id=current_user.id, name="Untitled Table", description="Insert Description Here", project_id=project_id)
             db.session.add(new_projecttable)
             db.session.commit()
             flash('Table Added!', category='success')
@@ -41,7 +44,7 @@ def home():
             db.session.add(new_task)
             db.session.commit()
             flash('Task Added!', category='success')
-        
+
         if 'delete_task' in request.form:
             task_id = request.form.get('task_id')
             task = Task.query.get(task_id)
@@ -49,7 +52,7 @@ def home():
                 db.session.delete(task)
                 db.session.commit()
                 flash('Task Deleted!', category='success')
-                
+
         if 'edit_task' in request.form:
             task_id = request.form.get('task_id')
             task = Task.query.get(task_id)
@@ -60,9 +63,12 @@ def home():
                 task.description = request.form.get('description')
                 db.session.commit()
                 flash('Task Updated!', category='success')
-    
-    return render_template("home.html", user=current_user)
 
+        if 'select_project' in request.form:
+            selected_project_id = request.form.get('selected_project_id')
+            selected_project = Project.query.get(selected_project_id)
+
+    return render_template("home.html", user=current_user,project_id = project_id)
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -76,6 +82,23 @@ def delete_note():
 
     return jsonify({})
 
-@views.route('/home')
+@views.route('/home', methods=['GET', 'POST'])
+@login_required
 def mainpage():
-    return render_template("taskmanagementweb.html", user=current_user)
+    projects = Project.query.filter_by(user_id=current_user.id).all()  # Retrieve all projects
+    selected_project = None
+    if request.method == 'POST':
+        if 'add_project' in request.form:
+            project_name = request.form.get('project_name')
+            project_description = request.form.get('project_description')
+            new_project = Project(name=project_name, description=project_description, user_id=current_user.id)
+            db.session.add(new_project)
+            db.session.commit()
+            project_id = new_project.id
+            flash('Project added!', category='success')
+            return redirect(url_for('views.home', project_id=project_id, user=current_user))
+        if 'select_project' in request.form:
+            selected_project_id = request.form.get('selected_project_id')
+            return redirect(url_for('views.home', project_id=selected_project_id, user=current_user))
+            
+    return render_template("taskmanagementweb.html", user=current_user, projects=projects, selected_project=selected_project)

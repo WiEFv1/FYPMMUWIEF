@@ -4,7 +4,9 @@
 
 {% block content %}
 <div>
+  <form method="POST">
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addProjectModal">Add Projects</button>
+  </form>
 </div>
 
 <!-- Add Project Modal -->
@@ -17,7 +19,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form method="POST" action="/add_project" id="addProjectForm">
+      <form method="POST" id="addProjectForm">
         <div class="modal-body">
           <div class="form-group">
             <label for="projectName">Project Name</label>
@@ -36,4 +38,21 @@
     </div>
   </div>
 </div>
+
+<!-- Dropdown to Select Project -->
+<div style="margin-top: 20px;">
+  <form method="POST">
+    <div class="form-group">
+      <label for="selectProject">Select Project</label>
+      <select class="form-control" id="selectProject" name="selected_project_id">
+        {% for project in projects %}
+        <option value="{{ project.id }}" {% if selected_project and project.id == selected_project.id %}selected{% endif %}>{{ project.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary" name="select_project">Select Project</button>
+  </form>
+</div>
+
+
 {% endblock %}

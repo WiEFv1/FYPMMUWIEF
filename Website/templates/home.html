@@ -3,8 +3,12 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+
 <h1 align="center">Notes</h1>
+<h1>Welcome to Home Page</h1>
+<p>Project ID: {{ project_id }}</p>
 <ul class="list-group list-group-flush" id="notes">
+
   {% for note in user.notes %}
   <li class="list-group-item">
     {{ note.data }}
@@ -16,6 +20,7 @@
 </ul>
 
 {% for projecttable in user.project_tables %}
+{% if projecttable.project_id == project_id %}
 <form method="POST">
 <div class="project-table-container">
 <h2>{{ projecttable.name }}</h2>
@@ -60,6 +65,7 @@
 <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#addTaskModal" onclick="setProjectId({{ projecttable.id }})">Add Task</button>
 </div>
 </form>
+{% endif %}
 {% endfor %}
 
 <form method="POST">
