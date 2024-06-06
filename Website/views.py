@@ -44,6 +44,7 @@ def home():
             db.session.add(new_task)
             db.session.commit()
             flash('Task Added!', category='success')
+            return redirect(url_for("views.home", user=current_user,project_id = project_id))
 
         if 'delete_task' in request.form:
             task_id = request.form.get('task_id')
@@ -64,9 +65,6 @@ def home():
                 db.session.commit()
                 flash('Task Updated!', category='success')
 
-        if 'select_project' in request.form:
-            selected_project_id = request.form.get('selected_project_id')
-            selected_project = Project.query.get(selected_project_id)
 
     return render_template("home.html", user=current_user,project_id = project_id)
 

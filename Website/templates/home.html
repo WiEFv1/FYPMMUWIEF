@@ -44,9 +44,7 @@
         <td>{{ task.deadline }}</td>
         <td>{{ task.description }}</td>
         <td>
-          {% for comment in task.comments %}
-            <p>{{ comment.comment_detail }}</p>
-          {% endfor %}
+          <button type="button" class="btn btn-secondary" >Click Here!</button>
         </td>
         <td>
           <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#editTaskModal" 
@@ -163,6 +161,7 @@
     </div>
   </div>
 </div>
+<!-- Comment Modal-->
 
 <script>
   function editTask(id, name, status, deadline, description) {
