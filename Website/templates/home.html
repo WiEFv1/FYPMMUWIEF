@@ -44,7 +44,7 @@
         <td>{{ task.deadline }}</td>
         <td>{{ task.description }}</td>
         <td>
-          <button type="button" class="btn btn-secondary" >Click Here!</button>
+          <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#commentModal" onclick="setTaskIdForComment({{ task.id }})">Add Comment</button>
         </td>
         <td>
           <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#editTaskModal" 
@@ -161,7 +161,37 @@
     </div>
   </div>
 </div>
+
 <!-- Comment Modal-->
+<div class="modal" tabindex="-1" role="dialog" id="commentModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Comment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div>
+        
+      </div>
+      <form method="POST" id="addCommentForm">
+        <div class="modal-body">
+          <input type="hidden" name="task_id" id="commentTaskId">
+          <div class="form-group">
+            <label for="commentDetail">Comment</label>
+            <textarea class="form-control" name="comment_detail" id="commentDetail" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary" name="add_comment">Add Comment</button>
+          
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
   function editTask(id, name, status, deadline, description) {
@@ -174,6 +204,10 @@
   }
   function setProjectId(projectId) {
     document.getElementById('projecttableId').value = projectId;
+  }
+
+  function setTaskIdForComment(taskId) {
+    document.getElementById('commentTaskId').value = taskId;
   }
 </script>
 

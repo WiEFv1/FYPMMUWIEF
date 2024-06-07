@@ -29,7 +29,7 @@ class Task(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
     projecttable_id = db.Column(db.Integer, db.ForeignKey('projecttable.id'))
-    comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'))
+    comment = db.relationship('Comment', backref='Task', foreign_keys='Comment.tasks_id')
 
 class Projecttable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +43,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment_detail = db.Column(db.String(10000))
-    task_id = db.Column(db.Integer, db.ForeignKey('task.id'))
+    tasks_id = db.Column(db.Integer, db.ForeignKey('task.id'))
 
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)

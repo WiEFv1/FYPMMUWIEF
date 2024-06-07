@@ -65,6 +65,13 @@ def home():
                 db.session.commit()
                 flash('Task Updated!', category='success')
 
+        if 'add_comment' in request.form:
+            task_id = request.form.get('task_id')
+            comment_detail = request.form.get('comment_detail')
+            new_comment = Comment(user_id=current_user.id, tasks_id=task_id, comment_detail=comment_detail)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('Comment added!', category='success')
 
     return render_template("home.html", user=current_user,project_id = project_id)
 
