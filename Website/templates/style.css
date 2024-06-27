@@ -28,3 +28,9 @@ body {
   .project-table-container {
     margin-bottom: 20px;
   }
+
+  .project-table-container-a {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 20px;
+}

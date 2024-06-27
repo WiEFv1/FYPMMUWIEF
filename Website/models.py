@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     comments = db.relationship('Comment', foreign_keys='Comment.user_id')
     project_tables = db.relationship('Projecttable', foreign_keys='Projecttable.user_id')
     project = db.relationship('Project',foreign_keys='Project.user_id')
+    shared_project = db.relationship('SharedProject',foreign_keys='SharedProject.shared_user_id')
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,3 +52,12 @@ class Project(db.Model):
     description = db.Column(db.String(10000))  
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     projecttable = db.relationship('Projecttable', backref='project', foreign_keys='Projecttable.project_id')
+    shared_project_id = db.relationship('SharedProject', foreign_keys='SharedProject.project_id')
+    shared_project_name = db.relationship('SharedProject', foreign_keys='SharedProject.project_name')
+    
+class SharedProject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'))
+    project_name = db.Column(db.Integer, db.ForeignKey('project.name'))
+    shared_user_role = db.Column(db.String(10000))
+    shared_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

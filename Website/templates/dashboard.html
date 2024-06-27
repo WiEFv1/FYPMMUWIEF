@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Project Dashboard</title>
+        <!-- Include Google Charts library -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    </head>
+<body>
+    <h1>Project Dashboard</h1>
+
+    <div id="projectInfo">
+        <h2>Project Name: <span id="projectName">Project Name</span></h2>
+        <p>Project Description: <span id="projectDescription">Project Description</span></p>
+    </div>
+
+    <h2>Task Status Distribution</h2>
+    <div id="taskStatusChart" style="width: 100%; height: 300px;" data-group-task="{{group_task_data_json}}"></div>
+
+    <script>
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawTaskStatusChart);
+        
+        function drawTaskStatusChart() {
+            var taskData = [['Task Status', 'Count']];
+            var groupTaskDataElement = document.getElementById('taskStatusChart');
+            var groupTaskData = JSON.parse(groupTaskDataElement.getAttribute('data-group-task'));
+            console.log(groupTaskData );
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Task Status');
+            data.addColumn('number', 'Count');
+            groupTaskData.forEach(function(task) {
+                data.addRow([task.task_status, task.count]);
+            });
+            // Set chart options
+            var options = {'title':'Project Progression', 'width':400,'height':300};
+
+            // Instantiate and draw our chart, passing in some options.
+            var chart = new google.visualization.PieChart(document.getElementById('taskStatusChart'));
+            chart.draw(data, options);
+        }
+    </script>
+</body>
+</html>
+
+{% endblock %}

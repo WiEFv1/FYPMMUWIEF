@@ -48,9 +48,27 @@
         {% for project in projects %}
         <option value="{{ project.id }}" {% if selected_project and project.id == selected_project.id %}selected{% endif %}>{{ project.name }}</option>
         {% endfor %}
+        {% for shared_project in shared_projects %}
+        <option value="{{ shared_project.project_id }}" {% if selected_project and shared_project.project_id  == selected_project.id %}selected{% endif %}>{{ shared_project.project_name }}</option>
+        {% endfor %}
       </select>
     </div>
     <button type="submit" class="btn btn-primary" name="select_project">Select Project</button>
+  </form>
+</div>
+
+<!-- Dropdown to Select Shared Project -->
+<div style="margin-top: 20px;">
+  <form method="POST">
+    <div class="form-group">
+      <label for="selectProject">Select Project</label>
+      <select class="form-control" id="selectProject" name="selected_project_id">
+        {% for shared_project in shared_projects %}
+        <option value="{{ shared_project.project_id }}" {% if selected_project and shared_project.project_id  == selected_project.id %}selected{% endif %}>{{ shared_project.project_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary" name="select_shared_project">Select Project</button>
   </form>
 </div>
 
