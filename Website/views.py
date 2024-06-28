@@ -78,6 +78,8 @@ def home():
                 task.description = request.form.get('description')
                 db.session.commit()
                 flash('Task Updated!', category='success')
+            else:
+                flash('Task not found or could not be updated.', category='error')
 
         if 'add_comment' in request.form:
             task_id = request.form.get('task_id')

@@ -61,11 +61,7 @@
             </td>
             <td>
               <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#editTaskModal" 
-                      data-task-id="{{ task.id }}" 
-                      data-task-name="{{ task.task_name }}"
-                      data-task-status="{{ task.task_status }}"
-                      data-task-deadline="{{ task.deadline }}"
-                      data-task-description="{{ task.description }}">
+                onclick="editTask('{{ task.id }}', '{{ task.task_name }}', '{{ task.task_status }}', '{{ task.deadline }}', '{{ task.description }}')">
                 Edit Task
               </button>
             </td>
@@ -113,13 +109,17 @@
           </div>
           <!--REMINDER: Make a drop down menu-->
           <div class="form-group">
-            <label for="editTaskStatus">Task Status</label>
-            <input type="text" class="form-control" name="task_status" id="editTaskStatus">
+           <label for="editTaskStatus">Task Status</label>
+            <select type="text" class="form-control" name="task_status" id="editTaskStatus">
+              <option value="Ongoing">Ongoing</option>
+              <option value="Paused">Paused</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
           </div>
-          <!--REMINDER: Have it to select a date and time format-->
           <div class="form-group">
             <label for="editTaskDeadline">Deadline</label>
-            <input type="text" class="form-control" name="deadline" id="editTaskDeadline">
+            <input type="date" class="form-control" name="deadline" id="editTaskDeadline">
           </div>
           <div class="form-group">
             <label for="editTaskDescription">Description</label>
@@ -129,7 +129,6 @@
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" name="edit_task">Save changes</button>
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <!--ISSUE: DELETE FUNCTION NOT WORKING AS INTENDED-->
           <button type="submit" class="btn btn-danger" name="delete_task" value="editTaskId">Delete Task</button>
         </div>
       </form>
@@ -283,6 +282,18 @@
     document.getElementById('editTaskStatus').value = status;
     document.getElementById('editTaskDeadline').value = deadline;
     document.getElementById('editTaskDescription').value = description;
+
+      // Get the select element for task status
+      var selectTaskStatus = document.getElementById("editTaskStatus");
+
+      // Loop through the options and set the selected attribute based on the task status
+      for (var i = 0; i < selectTaskStatus.options.length; i++) {
+          if (selectTaskStatus.options[i].value === taskStatus) {
+              selectTaskStatus.options[i].selected = true;
+              break; // Exit the loop once the option is selected
+          }
+      }
+
     $('#editTaskModal').modal('show');
   }
   function setProjectId(projectId) {
@@ -292,6 +303,8 @@
   function setTaskIdForComment(taskId) {
     document.getElementById('commentTaskId').value = taskId;
   }
+
+
 </script>
 
 {% endblock %}
