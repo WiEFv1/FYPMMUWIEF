@@ -22,8 +22,17 @@ def home():
     projects = Project.query.filter_by(id=project_id).first()
     projecttables = Projecttable.query.filter_by(project_id=project_id).all()
     shared_projects = SharedProject.query.filter_by(project_id=project_id).all()
+    
     shared_user_ids = [shared_project.shared_user_id for shared_project in shared_projects]
     shared_users = User.query.filter(User.id.in_(shared_user_ids)).all()
+    
+    project_tables = Projecttable.query.filter_by(project_id=project_id).all()
+    projecttable_id = [projecttable.id for projecttable in project_tables]
+    
+    group_task = Task.query.filter(Task.projecttable_id.in_(projecttable_id)).all()
+    task_id = [task.id for task in group_task]
+    
+    comments = Comment.query.filter(Comment.tasks_id.in_(task_id)).all()
     print("Shared Projects:")
     for shared_project in shared_projects:
         print(f"Shared Project ID: {shared_project.project_id}, Name: {shared_project.project_name}")
@@ -58,7 +67,7 @@ def home():
             db.session.add(new_task)
             db.session.commit()
             flash('Task Added!', category='success')
-            return redirect(url_for("views.home", user=current_user,project_id = project_id))
+            return redirect(url_for("views.home", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
 
         if 'delete_task' in request.form:
             task_id = request.form.get('task_id')
@@ -88,6 +97,8 @@ def home():
             db.session.add(new_comment)
             db.session.commit()
             flash('Comment added!', category='success')
+            return redirect(url_for("views.home", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
+            
             #ADD: A Feature that detects if there's a non-existing user
         if 'invite_user' in request.form:
             user_email= request.form.get('invite_email')
@@ -113,9 +124,9 @@ def home():
                 flash('User not found or role not changed.', category='error')
         
         if 'nav_dashboard' in request.form:
-            return redirect(url_for('views.dashboard', project_id=project_id, user=current_user,projecttables=projecttables))
+            return redirect(url_for('views.dashboard', user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
             
-    return render_template("home.html", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users)
+    return render_template("home.html", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments)
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -160,12 +171,17 @@ def mainpage():
 def dashboard():
     projects = Project.query.filter_by(user_id=current_user.id).all()  # Retrieve all projects
     shared_projects = SharedProject.query.filter_by(shared_user_id=current_user.id).all()
+    
     project_id = request.args.get('project_id')
     project_id = int(project_id) if project_id else None
+    
     project_tables = Projecttable.query.filter_by(project_id=project_id).all()
     projecttable_id = [projecttable.id for projecttable in project_tables]
-    group_task = Task.query.filter(Task.projecttable_id.in_(projecttable_id)).all()
     
+    group_task = Task.query.filter(Task.projecttable_id.in_(projecttable_id)).all()
+    task_id = [task.id for task in group_task]
+    
+    comments = Comment.query.filter(Comment.tasks_id.in_(task_id)).all()
     # Extract the task statuses from the 'group_task' data
     task_statuses = [task.task_status for task in group_task]
 

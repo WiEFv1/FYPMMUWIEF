@@ -200,6 +200,15 @@
             <label for="commentDetail">Comment</label>
             <textarea class="form-control" name="comment_detail" id="commentDetail" required></textarea>
           </div>
+          <div>
+            <ul>
+              {% for comment in comments %}
+                
+                <li>{{ comment.comment_detail }}</li>
+
+              {% endfor %}
+            </ul>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary" name="add_comment">Add Comment</button>
