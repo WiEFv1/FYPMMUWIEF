@@ -28,15 +28,15 @@
 <div>
   <form method="POST">
     
-    {% if shared_users.shared_user_role == "Admin" or current_user.id == projects.user_id%}
-      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#inviteModal">
+    {% if current_shared_users.shared_user_role == "Admin" or current_user.id == projects.user_id %}
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#inviteModal">
         Invite User
-      </button>
+    </button>
     
     <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#settingsModal">
-      Settings
+        Settings
     </button>
-    {% endif %}
+{% endif %}
   </form>
 </div>
 

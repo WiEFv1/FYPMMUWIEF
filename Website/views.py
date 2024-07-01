@@ -1,6 +1,6 @@
 #views.py
 
-from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for
+from flask import Blueprint, redirect, render_template, request, flash, jsonify, url_for, session
 from flask_login import login_required, current_user
 from .models import *
 from . import db
@@ -25,6 +25,7 @@ def home():
     
     shared_user_ids = [shared_project.shared_user_id for shared_project in shared_projects]
     shared_users = User.query.filter(User.id.in_(shared_user_ids)).all()
+    current_shared_users = SharedProject.query.filter_by(shared_user_id=current_user.id, project_id=project_id).first()
     
     project_tables = Projecttable.query.filter_by(project_id=project_id).all()
     projecttable_id = [projecttable.id for projecttable in project_tables]
@@ -153,6 +154,9 @@ def home():
                 shared_user.shared_user_role = new_role
                 db.session.commit()
                 flash('User role changed successfully!', category='success')
+                session['shared_user_role'] = new_role
+                
+                return redirect(url_for('views.home', project_id=project_id)) 
             else:
                 flash('User not found or role not changed.', category='error')
         
@@ -173,7 +177,7 @@ def home():
                 flash('Task not found or could not be updated.', category='error')
             
     return render_template("home.html", user=current_user,project_id = project_id,projecttables=projecttables,
-                           shared_projects=shared_projects,shared_users=shared_users,comments=comments,
+                           shared_projects=shared_projects,current_shared_users=current_shared_users,shared_users=shared_users,comments=comments,
                            projects=projects)
 
 @views.route('/delete-note', methods=['POST'])
