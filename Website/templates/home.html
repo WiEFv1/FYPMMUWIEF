@@ -3,7 +3,7 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-
+<div class="text" style="position: absolute; top: 10px; text-align: center; font-weight: bold; color: white;" >{{user.first_name}}</div>
 <h1>{{ projects.name }}</h1>
 <title>{{ projects.name }}</title>
 <ul class="list-group list-group-flush" id="notes">
@@ -25,7 +25,7 @@
     <button type="submit" class="btn btn-primary" name="create_table">Create Table</button>
   </div>
   </form>
-
+<div>
   <form method="POST">
     
     {% if shared_users.shared_user_role == "Admin" or current_user.id == projects.user_id%}

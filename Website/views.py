@@ -148,9 +148,9 @@ def home():
             new_role = request.form.get('new_role')
             
             # Update the selected user's role in the database based on the new role
-            shared_project = SharedProject.query.filter_by(shared_user_id=selected_user_id).first()
-            if shared_project:
-                shared_project.shared_user_role = new_role
+            shared_user = SharedProject.query.filter_by(shared_user_id=selected_user_id, project_id=project_id).first()
+            if shared_user:
+                shared_user.shared_user_role = new_role
                 db.session.commit()
                 flash('User role changed successfully!', category='success')
             else:
@@ -249,7 +249,8 @@ def dashboard():
             return redirect(url_for('views.home', user=current_user,project_id = project_id))
     
     # Return the JSON-serializable 'group_task_data' to the template
-    return render_template("dashboard.html", user=current_user, projects=projects, shared_projects=shared_projects, group_task_data=group_task_data, group_task_data_json=group_task_data_json,group_task_json=group_task_json)
+    return render_template("dashboard.html", user=current_user, projects=projects, shared_projects=shared_projects, 
+                           group_task_data=group_task_data, group_task_data_json=group_task_data_json,group_task_json=group_task_json)
 
 @views.route('/get_comments')
 def get_comments():
