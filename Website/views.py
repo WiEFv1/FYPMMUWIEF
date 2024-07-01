@@ -245,6 +245,9 @@ def dashboard():
     for task_data in group_task_parsed:
         print(f'Task Status: {task_data["task_status"]}')
     
+    if 'nav_dashboard' in request.form:
+            return redirect(url_for('views.home', user=current_user,project_id = project_id))
+    
     # Return the JSON-serializable 'group_task_data' to the template
     return render_template("dashboard.html", user=current_user, projects=projects, shared_projects=shared_projects, group_task_data=group_task_data, group_task_data_json=group_task_data_json,group_task_json=group_task_json)
 
