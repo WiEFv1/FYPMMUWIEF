@@ -8,7 +8,7 @@ import json
 from flask import jsonify
 from collections import Counter
 
-
+user = current_user
 views = Blueprint('views', __name__)
 
 @views.route('/taskmanagement', methods=['GET', 'POST'])
@@ -32,7 +32,9 @@ def home():
     group_task = Task.query.filter(Task.projecttable_id.in_(projecttable_id)).all()
     task_id = [task.id for task in group_task]
     
+    tasks_id = request.args.get('tasks_id')
     comments = Comment.query.filter(Comment.tasks_id.in_(task_id)).all()
+    
     print("Shared Projects:")
     for shared_project in shared_projects:
         print(f"Shared Project ID: {shared_project.project_id}, Name: {shared_project.project_name}")
@@ -53,21 +55,35 @@ def home():
             db.session.add(new_projecttable)
             db.session.commit()
             flash('Table Added!', category='success')
+            return redirect(url_for("views.home", user=current_user, project_id=project_id, projecttables=projecttables,
+                                    shared_projects=shared_projects, shared_users=shared_users, comments=comments,
+                                    projects=projects))
         
         if 'add_task' in request.form:
             projecttable_id = request.form.get('projecttable_id')
-            new_task = Task(
-                user_id=current_user.id,
-                projecttable_id=projecttable_id,
-                task_name=request.form.get('task_name'),
-                task_status=request.form.get('task_status'),
-                deadline=request.form.get('deadline'),
-                description=request.form.get('description')
-            )
-            db.session.add(new_task)
-            db.session.commit()
-            flash('Task Added!', category='success')
-            return redirect(url_for("views.home", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
+            task_name = request.form.get('task_name')
+            task_status = request.form.get('task_status')
+            deadline = request.form.get('deadline')
+            description = request.form.get('description')
+
+            if not task_name or not task_status or not deadline:
+                flash('Please fill in all required fields.', category='error')
+            else:
+                new_task = Task(
+                    user_id=current_user.id,
+                    projecttable_id=projecttable_id,
+                    task_name=task_name,
+                    task_status=task_status,
+                    deadline=deadline,
+                    description=description
+                )
+                db.session.add(new_task)
+                db.session.commit()
+                flash('Task Added!', category='success')
+
+            return redirect(url_for("views.home", user=current_user, project_id=project_id, projecttables=projecttables,
+                                    shared_projects=shared_projects, shared_users=shared_users, comments=comments,
+                                    projects=projects))
 
         if 'delete_task' in request.form:
             task_id = request.form.get('task_id')
@@ -79,16 +95,28 @@ def home():
 
         if 'edit_task' in request.form:
             task_id = request.form.get('task_id')
-            task = Task.query.get(task_id)
-            if task:
-                task.task_name = request.form.get('task_name')
-                task.task_status = request.form.get('task_status')
-                task.deadline = request.form.get('deadline')
-                task.description = request.form.get('description')
-                db.session.commit()
-                flash('Task Updated!', category='success')
+            task_name = request.form.get('task_name')
+            task_status = request.form.get('task_status')
+            deadline = request.form.get('deadline')
+            description = request.form.get('description')
+
+            if not task_name or not task_status or not deadline:
+                flash('Please fill in all required fields.', category='error')
             else:
-                flash('Task not found or could not be updated.', category='error')
+                task = Task.query.get(task_id)
+                if task:
+                    task.task_name = task_name
+                    task.task_status = task_status
+                    task.deadline = deadline
+                    task.description = description
+                    db.session.commit()
+                    flash('Task Updated!', category='success')
+                else:
+                    flash('Task not found or could not be updated.', category='error')
+
+            return redirect(url_for("views.home", user=current_user, project_id=project_id, projecttables=projecttables,
+                                    shared_projects=shared_projects, shared_users=shared_users, comments=comments,
+                                    projects=projects))
 
         if 'add_comment' in request.form:
             task_id = request.form.get('task_id')
@@ -97,13 +125,18 @@ def home():
             db.session.add(new_comment)
             db.session.commit()
             flash('Comment added!', category='success')
-            return redirect(url_for("views.home", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
+            return redirect(url_for("views.home", user=current_user,project_id = project_id,projecttables=projecttables,
+                                    shared_projects=shared_projects,shared_users=shared_users,comments=comments,
+                                    projects=projects))
             
             #ADD: A Feature that detects if there's a non-existing user
         if 'invite_user' in request.form:
             user_email= request.form.get('invite_email')
             user = User.query.filter_by(email=user_email).first()
-            if current_user.id == user.id:  # Check if the current user is sharing the project with themselves
+            
+            if user is None:
+                flash('User with the provided email does not exist.', category='error')
+            elif current_user.id == user.id:  # Check if the current user is sharing the project with themselves
                 flash('Cannot share project with yourself!', category='error')
             else:
                 shared_project = SharedProject(project_id=project_id, shared_user_id=user.id,project_name=projects.name,shared_user_role="Member" )
@@ -124,9 +157,24 @@ def home():
                 flash('User not found or role not changed.', category='error')
         
         if 'nav_dashboard' in request.form:
-            return redirect(url_for('views.dashboard', user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments))
+            return redirect(url_for('views.dashboard', user=current_user,project_id = project_id,projecttables=projecttables,
+                                    shared_projects=shared_projects,shared_users=shared_users,comments=comments,
+                                    projects=projects))
+        
+        if 'edit_project_table' in request.form:
+            projecttable_id = request.form.get('projecttable_id')
+            projecttable = Projecttable.query.get(projecttable_id)
+            if projecttable:
+                projecttable.name = request.form.get('projecttable_name')
+                projecttable.description = request.form.get('projecttable_description')
+                db.session.commit()
+                flash('Task Updated!', category='success')
+            else:
+                flash('Task not found or could not be updated.', category='error')
             
-    return render_template("home.html", user=current_user,project_id = project_id,projecttables=projecttables,shared_projects=shared_projects,shared_users=shared_users,comments=comments)
+    return render_template("home.html", user=current_user,project_id = project_id,projecttables=projecttables,
+                           shared_projects=shared_projects,shared_users=shared_users,comments=comments,
+                           projects=projects)
 
 @views.route('/delete-note', methods=['POST'])
 def delete_note():
@@ -169,19 +217,18 @@ def mainpage():
 @views.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    projects = Project.query.filter_by(user_id=current_user.id).all()  # Retrieve all projects
-    shared_projects = SharedProject.query.filter_by(shared_user_id=current_user.id).all()
-    
+
+    shared_projects = request.args.get('shared_projects')
     project_id = request.args.get('project_id')
     project_id = int(project_id) if project_id else None
     
+    projects = Project.query.filter_by(id=project_id).first()
     project_tables = Projecttable.query.filter_by(project_id=project_id).all()
     projecttable_id = [projecttable.id for projecttable in project_tables]
     
     group_task = Task.query.filter(Task.projecttable_id.in_(projecttable_id)).all()
     task_id = [task.id for task in group_task]
-    
-    comments = Comment.query.filter(Comment.tasks_id.in_(task_id)).all()
+
     # Extract the task statuses from the 'group_task' data
     task_statuses = [task.task_status for task in group_task]
 
@@ -190,11 +237,21 @@ def dashboard():
 
     # Convert the task status counts into a list of dictionaries for JSON serialization
     group_task_data = [{'task_status': status, 'count': count} for status, count in task_status_counts.items()]
+    group_task_task = [{'task_status': task.task_status, 'task_name': task.task_name} for task in group_task]
     group_task_data_json = json.dumps(group_task_data)
     group_task_data_parsed = json.loads(group_task_data_json)
-    for task_data in group_task_data_parsed:
-        print(f'Task Status: {task_data["task_status"]}, Count: {task_data["count"]}')
+    group_task_json = json.dumps(group_task_task)
+    group_task_parsed = json.loads(group_task_json)
+    for task_data in group_task_parsed:
+        print(f'Task Status: {task_data["task_status"]}')
     
     # Return the JSON-serializable 'group_task_data' to the template
-    return render_template("dashboard.html", user=current_user, projects=projects, shared_projects=shared_projects, group_task_data=group_task_data, group_task_data_json=group_task_data_json)
+    return render_template("dashboard.html", user=current_user, projects=projects, shared_projects=shared_projects, group_task_data=group_task_data, group_task_data_json=group_task_data_json,group_task_json=group_task_json)
 
+@views.route('/get_comments')
+def get_comments():
+    tasks_id = request.args.get('tasks_id')
+    comments = Comment.query.filter(Comment.tasks_id == tasks_id).all()
+    comments_data = [{'comment_detail': comment.comment_detail, 'tasks_id': comment.tasks_id} for comment in comments]
+    
+    return jsonify(comments_data)
